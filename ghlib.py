@@ -296,6 +296,9 @@ class Alert(AlertBase):
     def short_desc(self):
         return self.json["rule"]["id"]
 
+    def severity(self):
+        return self.json["rule"]["security_severity_level"]
+
     def get_key(self):
         return util.make_key(self.github_repo.repo_id + "/" + str(self.number()))
 
@@ -331,6 +334,9 @@ class Secret(AlertBase):
 
     def short_desc(self):
         return self.long_desc()
+
+    def severity(self):
+        return "Critical"
 
     def get_key(self):
         return util.make_key(

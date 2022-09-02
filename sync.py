@@ -58,6 +58,7 @@ class Sync:
                 alert.github_repo.repo_id,
                 alert.short_desc(),
                 alert.long_desc(),
+                alert.severity(),
                 alert.hyperlink(),
                 alert.get_type(),
                 alert.number(),
