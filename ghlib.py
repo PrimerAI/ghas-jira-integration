@@ -1,7 +1,8 @@
-import requests
+import base64
 import logging
 import json
 import jwt
+import requests
 import time
 import util
 from requests import HTTPError
@@ -62,7 +63,7 @@ class GitHub:
     def default_headers(self):
         token = self.token
         if self.app_id:
-            token = self.get_access_token(self.app_id, self.app_secret, self.install_id)
+            token = self.get_access_token(self.app_id, base64.b64decode(self.app_secret), self.install_id)
 
         auth = {"Authorization": "token " + token}
         auth.update(util.json_accept_header())
