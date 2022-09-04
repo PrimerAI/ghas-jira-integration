@@ -39,8 +39,8 @@ def serve(args):
     if not args.gh_url or not args.jira_url:
         fail("Both GitHub and JIRA URL have to be specified!")
 
-    if not args.gh_token:
-        fail("No GitHub token specified!")
+    if not args.gh_token and not args.gh_app_id and not args.gh_app_secret and not args.gh_install_id:
+        fail("No GitHub token or Github OAuth app credentials specified!")
 
     if not args.jira_user or not args.jira_token:
         fail("No JIRA credentials specified!")
@@ -51,7 +51,7 @@ def serve(args):
     if not args.secret:
         fail("No Webhook secret specified!")
 
-    github = ghlib.GitHub(args.gh_url, args.gh_token)
+    github = ghlib.GitHub(args.gh_url, args.gh_token, args.gh_app_id, args.gh_app_secret, args.gh_install_id)
     jira = jiralib.Jira(args.jira_url, args.jira_user, args.jira_token)
     s = Sync(
         github,
@@ -65,8 +65,8 @@ def sync(args):
     if not args.gh_url or not args.jira_url:
         fail("Both GitHub and JIRA URL have to be specified!")
 
-    if not args.gh_token:
-        fail("No GitHub credentials specified!")
+    if not args.gh_token and not args.gh_app_id and not args.gh_app_secret and not args.gh_install_id:
+        fail("No GitHub token or Github OAuth app credentials specified!")
 
     if not args.jira_user or not args.jira_token:
         fail("No JIRA credentials specified!")
@@ -80,7 +80,7 @@ def sync(args):
     if not args.gh_repo:
         fail("No GitHub repository specified!")
 
-    github = ghlib.GitHub(args.gh_url, args.gh_token)
+    github = ghlib.GitHub(args.gh_url, args.gh_token, args.gh_app_id, args.gh_app_secret, args.gh_install_id)
     jira = jiralib.Jira(args.jira_url, args.jira_user, args.jira_token)
     jira_project = jira.getProject(
         args.jira_project,
@@ -131,7 +131,7 @@ def install_hooks(args):
         if not args.gh_org:
             fail("No GitHub organization specified!")
 
-        github = ghlib.GitHub(args.gh_url, args.gh_token)
+        github = ghlib.GitHub(args.gh_url, args.gh_token, args.gh_app_id, args.gh_app_secret)
 
         if args.gh_repo:
             ghrepo = github.getRepository(args.gh_org + "/" + args.gh_repo)
@@ -159,7 +159,7 @@ def list_hooks(args):
         if not args.gh_org:
             fail("No GitHub organization specified!")
 
-        github = ghlib.GitHub(args.gh_url, args.gh_token)
+        github = ghlib.GitHub(args.gh_url, args.gh_token, args.gh_app_id, args.gh_app_secret)
 
         if args.gh_repo:
             for h in github.getRepository(
@@ -193,6 +193,21 @@ def main():
         "--gh-token",
         help="GitHub API token. Alternatively, the GH2JIRA_GH_TOKEN may be set.",
         default=os.getenv("GH2JIRA_GH_TOKEN"),
+    )
+    credential_base.add_argument(
+        "--gh-app-id",
+        help="GitHub OAuth app id. Alternatively, the GH2JIRA_GH_APP_ID may be set.",
+        default=os.getenv("GH2JIRA_GH_APP_ID"),
+    )
+    credential_base.add_argument(
+        "--gh-app-secret",
+        help="GitHub OAuth app secret. Alternatively, the GH2JIRA_GH_APP_SECRET may be set.",
+        default=os.getenv("GH2JIRA_GH_APP_SECRET"),
+    )
+    credential_base.add_argument(
+        "--gh-install-id",
+        help="GitHub OAuth app secret. Alternatively, the GH2JIRA_GH_INSTALL_ID may be set.",
+        default=os.getenv("GH2JIRA_GH_INSTALL_ID"),
     )
     credential_base.add_argument("--jira-url", help="URL of JIRA instance")
     credential_base.add_argument("--jira-user", help="JIRA user name")

@@ -1,6 +1,8 @@
 import requests
 import logging
 import json
+import jwt
+import time
 import util
 from requests import HTTPError
 
@@ -22,12 +24,47 @@ logger = logging.getLogger(__name__)
 
 
 class GitHub:
-    def __init__(self, url, token):
+    def __init__(self, url, token, app_id, app_secret, install_id):
         self.url = url
         self.token = token
+        self.app_id = app_id
+        self.app_secret = app_secret
+        self.install_id = install_id
+
+
+    def github_app_headers(self, gh_app_id, gh_app_secret):
+
+        time_since_epoch_in_seconds = int(time.time())
+        payload = {
+        # issued at time
+        'iat': time_since_epoch_in_seconds,
+        # JWT expiration time (10 minute maximum)
+        'exp': time_since_epoch_in_seconds + (10 * 60),
+        # GitHub App's identifier
+        'iss': gh_app_id
+        }
+
+        actual_jwt = jwt.encode(payload, gh_app_secret, algorithm='RS256')
+
+        headers = {"Authorization": "Bearer {}".format(actual_jwt),
+                "Accept": "application/vnd.github.machine-man-preview+json"}
+
+        return headers
+
+    def get_access_token(self, app_id, app_secret, install_id):
+        """Get an access token for the GitHub App."""
+        resp = requests.post('https://api.github.com/app/installations/{}/access_tokens'.format(install_id),
+                     headers=self.github_app_headers(app_id, app_secret))
+        resp_content = json.loads(resp.content.decode())
+
+        return resp_content["token"]
 
     def default_headers(self):
-        auth = {"Authorization": "token " + self.token}
+        token = self.token
+        if self.app_id:
+            token = self.get_access_token(self.app_id, self.app_secret, self.install_id)
+
+        auth = {"Authorization": "token " + token}
         auth.update(util.json_accept_header())
         return auth
 
