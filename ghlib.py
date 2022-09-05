@@ -62,9 +62,6 @@ class GitHub:
 
     def default_headers(self):
         token = self.token
-        logger.debug(self.app_id)
-        logger.debug(self.app_secret)
-        logger.debug(self.install_id)
         if self.app_id:
             token = self.get_access_token(self.app_id, base64.b64decode(self.app_secret), self.install_id)
 
