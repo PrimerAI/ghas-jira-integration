@@ -23,6 +23,15 @@ inputs:
     description: 'GitHub API token with the required permissions'
     required: false
     default: ${{ github.token }}
+  github_app_id:
+    description: 'GitHub app ID'
+    required: false
+  github_install_id:
+    description: 'GitHub app install ID'
+    required: false
+  github_app_secret:
+    description: 'GitHub app private key'
+    required: false
   sync_direction:
     description: 'Which direction to synchronize in ("gh2jira", "jira2gh" or "both")'
     required: false
@@ -47,6 +56,9 @@ runs:
     shell: bash
     env:
       INPUTS_GITHUB_TOKEN: ${{ inputs.github_token }}
+      INPUTS_GITHUB_APP_ID: ${{ inputs.github_app_id }}
+      INPUTS_GITHUB_INSTALL_ID: ${{ inputs.github_install_id }}
+      INPUTS_GITHUB_APP_SECRET: ${{ inputs.github_app_secret }}
       INPUTS_JIRA_URL: ${{ inputs.jira_url }}
       INPUTS_JIRA_USER: ${{ inputs.jira_user }}
       INPUTS_JIRA_TOKEN: ${{ inputs.jira_token }}
@@ -61,6 +73,9 @@ runs:
       ./gh2jira sync \
         --gh-url "$GITHUB_API_URL" \
         --gh-token "$INPUTS_GITHUB_TOKEN" \
+        --gh-app-id "$INPUTS_GITHUB_APP_ID" \
+        --gh-install-id "$INPUTS_GITHUB_INSTALL_ID" \
+        --gh-app-secret "$INPUTS_GITHUB_APP_SECRET" \
         --gh-org "$GITHUB_REPOSITORY_OWNER" \
         --gh-repo "$REPOSITORY_NAME" \
         --jira-url "$INPUTS_JIRA_URL" \
