@@ -335,7 +335,10 @@ class Alert(AlertBase):
         return self.json["rule"]["id"]
 
     def severity(self):
-        return self.json["rule"]["security_severity_level"]
+        if "security_severity_level" in self.json["rule"]:
+            return self.json["rule"]["security_severity_level"]
+
+        return "None"
 
     def get_key(self):
         return util.make_key(self.github_repo.repo_id + "/" + str(self.number()))
