@@ -16,7 +16,7 @@ secret = None
 
 
 def run_server(
-    sync_object, webhook_secret, repository_sync_interval=60 * 60 * 24, port=5000
+    sync_object, webhook_secret, repository_sync_interval=60 * 60 * 24, port=5000, host="0.0.0.0"
 ):
     global sync
     sync = sync_object
@@ -24,7 +24,7 @@ def run_server(
     secret = webhook_secret.encode("utf-8")
     global repo_sync_interval
     repo_sync_interval = repository_sync_interval
-    app.run(port=port)
+    app.run(port=port, host=host)
 
 
 def auth_is_valid(signature, request_body):

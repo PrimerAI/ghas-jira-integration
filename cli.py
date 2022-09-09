@@ -39,8 +39,11 @@ def serve(args):
     if not args.gh_url or not args.jira_url:
         fail("Both GitHub and JIRA URL have to be specified!")
 
-    if not args.gh_token and not args.gh_app_id and not args.gh_app_secret and not args.gh_install_id:
+    if not args.gh_token and not args.gh_app_id and not args.gh_install_id:
         fail("No GitHub token or Github OAuth app credentials specified!")
+
+    with open('/code/github_app_secret/GH2JIRA_GH_APP_SECRET') as f:
+        github_app_secret = f.read()
 
     if not args.jira_user or not args.jira_token:
         fail("No JIRA credentials specified!")
@@ -51,14 +54,14 @@ def serve(args):
     if not args.secret:
         fail("No Webhook secret specified!")
 
-    github = ghlib.GitHub(args.gh_url, args.gh_token, args.gh_app_id, args.gh_app_secret, args.gh_install_id)
+    github = ghlib.GitHub(args.gh_url, args.gh_token, args.gh_app_id, github_app_secret, args.gh_install_id)
     jira = jiralib.Jira(args.jira_url, args.jira_user, args.jira_token)
     s = Sync(
         github,
-        jira.getProject(args.jira_project, args.jira_labels),
+        jira.getProject(args.jira_project, args.issue_end_state, args.issue_reopen_state, args.jira_labels),
         direction=direction_str_to_num(args.direction),
     )
-    server.run_server(s, args.secret, port=args.port)
+    server.run_server(s, args.secret, port=args.port, host="0.0.0.0")
 
 
 def sync(args):

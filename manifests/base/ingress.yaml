@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    external-dns.alpha.kubernetes.io/target: k8s-external.dev.primering.net
+    ingress.kubernetes.io/ssl-proxy-headers: 'X-Forwarded-Proto: https'
+    ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/frontend-entry-points: exthttp,exthttps
+  labels:
+    owner: infra
+  name: ghas-jira-integration
+  namespace: tools
+spec:
+  rules:
+  - host: ghas-sync-serve.dev.primering.net
+    http:
+      paths:
+      - backend:
+          service:
+            name: ghas-jira-integration
+            port:
+              number: 5000
+        path: /
+        pathType: Prefix

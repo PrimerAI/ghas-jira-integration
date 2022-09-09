@@ -6,3 +6,4 @@ jira~=3.0.0
 pyjwt~=2.4.0
 logging-formatter-anticrlf==1.2
 requests~=2.26.0
+pyjwt

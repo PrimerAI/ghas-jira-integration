@@ -1,0 +1,111 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ghas-jira-integration
+  namespace: tools
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ghas-jira-integration
+  namespace: tools
+  labels:
+    app: ghas-jira-integration
+    CostProduct: devops
+    CostTech: k8s
+    owner: infra
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ghas-jira-integration
+  template:
+    metadata:
+      labels:
+        app: ghas-jira-integration
+        owner: infra
+    spec:
+      volumes:
+      - name: github-app-secret
+        secret:
+          secretName: ghas-jira-integration
+          optional: false
+      serviceAccountName: "ghas-jira-integration"
+      containers:
+        - name: ghas-jira-integration
+          image: 963188529772.dkr.ecr.us-west-2.amazonaws.com/ghas2jira:v1
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 50m
+            limits:
+              memory: 128Mi
+              cpu: 100m
+          ports:
+            - containerPort: 5000
+          volumeMounts:
+          - name: github-app-secret
+            mountPath: "/code/github_app_secret"
+            readOnly: true
+          env:
+            - name: GITHUB_URL
+              value: "https://api.github.com"
+            - name: GITHUB_ORG
+              value: "PrimerAI"
+            - name: JIRA_URL
+              value: "https://primer.atlassian.net"
+            - name: JIRA_USER
+              value: "trevor@primer.ai"
+            - name: JIRA_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: ghas-jira-integration
+                  key: JIRA_TOKEN
+            - name: JIRA_PROJECT
+              value: "11560"
+            - name: WEBHOOK_PORT
+              value: "5000"
+            - name: WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: ghas-jira-integration
+                  key: WEBHOOK_SECRET
+            - name: SYNC_DIRECTION
+              value: "both"
+            - name: GH2JIRA_GH_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: ghas-jira-integration
+                  key: GH2JIRA_GH_APP_ID
+            - name: GH2JIRA_GH_INSTALL_ID
+              valueFrom:
+                secretKeyRef:
+                  name: ghas-jira-integration
+                  key: GH2JIRA_GH_INSTALL_ID
+            - name: GH2JIRA_GH_APP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: ghas-jira-integration
+                  key: GH2JIRA_GH_APP_SECRET
+            - name: GH2JIRA_JIRA_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: ghas-jira-integration
+                  key: JIRA_TOKEN
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: STATSD_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: STATSD_PORT
+              value: "8125"
+            - name: AWS_METADATA_SERVICE_NUM_ATTEMPTS
+              value: "500000"
