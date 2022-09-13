@@ -328,7 +328,7 @@ def parse_alert_info(desc):
     them as a tuple. If parsing fails for one of the fields,
     return a tuple of None's.
     """
-    failed = None, None, None, None
+    failed = None, None, None, None, None
     m = re.search("REPOSITORY_NAME=(.*)$", desc, re.MULTILINE)
     if m is None:
         return failed

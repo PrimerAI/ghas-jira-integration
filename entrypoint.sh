@@ -11,5 +11,6 @@ cd /code && pipenv run ./gh2jira serve \
                             --jira-project "$JIRA_PROJECT" \
                             --port "$WEBHOOK_PORT" \
                             --secret "$WEBHOOK_SECRET" \
-                            --jira-labels '${{ github.event.repository.name }},security,vulnerability,github' \
+                            --issue-end-state "suppressed" \
+                            --jira-labels 'security,vulnerability,github' \
                             --direction "$SYNC_DIRECTION"

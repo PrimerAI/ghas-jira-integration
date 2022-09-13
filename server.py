@@ -136,15 +136,6 @@ def github_webhook():
     alert_url = alert.get("html_url")
     alert_num = alert.get("number")
 
-    # TODO: We might want to do the following asynchronously, as it could
-    # take time to do a full sync on a repo with many alerts / issues
-    last_sync = last_repo_syncs.get(repo_id, 0)
-    now = datetime.now().timestamp()
-    if now - last_sync >= repo_sync_interval:
-        last_repo_syncs[repo_id] = now
-        with sync_lock:
-            sync.sync_repo(repo_id)
-
     app.logger.debug(
         "Received GITHUB webhook {action} for {alert_url}".format(
             action=transition, alert_url=alert_url

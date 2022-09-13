@@ -239,7 +239,7 @@ def main():
     issue_state_base.add_argument(
         "--issue-end-state",
         help="Custom end state (e.g. Closed) Done by default",
-        default="Done",
+        default="suppressed",
     )
     issue_state_base.add_argument(
         "--issue-reopen-state",
