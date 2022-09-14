@@ -379,6 +379,11 @@ class Secret(AlertBase):
     def short_desc(self):
         return self.long_desc()
 
+    def repo_name(self):
+        logger.debug(self.json)
+        url_split = self.json["html_url"].split("/")
+        return url_split[4]
+
     def severity(self):
         return "Critical"
 

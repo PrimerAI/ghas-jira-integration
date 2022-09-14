@@ -177,8 +177,8 @@ class JiraProject:
         repo_key,
         alert_key,
     ):
+        repo_split = repo_id.split("/")
 
-        logger.debug(severity)
         match severity:
             case "critical":
                 priority = "Highest (P0)"
@@ -205,7 +205,7 @@ class JiraProject:
             ),
             issuetype={"name": "Bug"},
             priority={"name": priority},
-            labels=self.labels,
+            labels=[repo_split[1], "security", "github", "vulnerability"],
         )
         logger.info(
             "Created issue {issue_key} for alert {alert_num} in {repo_id}.".format(
